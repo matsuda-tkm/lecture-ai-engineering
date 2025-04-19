@@ -1,19 +1,22 @@
 import os
 import torch
-from transformers import pipeline
+from transformers import pipeline, AutoTokenizer
 import time
 import traceback
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Optional, List, Dict, Any
+from typing import Optional
 import uvicorn
 import nest_asyncio
 from pyngrok import ngrok
+from dotenv import load_dotenv
+
+load_dotenv()  # .envファイルから環境変数を読み込む
 
 # --- 設定 ---
 # モデル名を設定
-MODEL_NAME = "google/gemma-2-2b-jpn-it"  # お好みのモデルに変更可能です
+MODEL_NAME = "microsoft/bitnet-b1.58-2B-4T"  # お好みのモデルに変更可能です
 print(f"モデル名を設定: {MODEL_NAME}")
 
 # --- モデル設定クラス ---
@@ -66,9 +69,12 @@ def load_model():
     try:
         device = "cuda" if torch.cuda.is_available() else "cpu"
         print(f"使用デバイス: {device}")
+        # トークナイザーとモデルを明示的にロード
+        tokenizer = AutoTokenizer.from_pretrained(config.MODEL_NAME)
         pipe = pipeline(
             "text-generation",
             model=config.MODEL_NAME,
+            tokenizer=tokenizer,
             model_kwargs={"torch_dtype": torch.bfloat16},
             device=device
         )

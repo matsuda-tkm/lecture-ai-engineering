@@ -1,8 +1,10 @@
 fastapi
 uvicorn
 pydantic
-transformers
+git+https://github.com/shumingma/transformers.git
 accelerate
 sentencepiece
 protobuf
 pyngrok
+nest-asyncio
+python-dotenv
